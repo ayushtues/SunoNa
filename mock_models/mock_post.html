@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Home Page</title>
+</head>
+
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <button type="submit" onclick='myfunction_clickevent2()'>Run my Python!</button>
+    <script>
+        // var dictToSend = { 'text': 'my name is ayush', 'from_language': 'en', 'to_language': 'hi' }
+        var dictToSend = { 'text': 'my name is ayush' }
+
+        function myfunction_clickevent1() {
+            var callback = $.ajax({
+                type: "POST",
+                url: "http://localhost:5000/text2text",
+                data: dictToSend,
+                success: function (msg) {
+                    console.log(msg);
+                }
+            });
+        }
+        function myfunction_clickevent2() {
+            var callback = $.ajax({
+                type: "POST",
+                url: "http://localhost:5000/text2speech",
+                data: dictToSend,
+                success: function (msg) {
+                    console.log(msg); // need to figure out how to play the audio file
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
