@@ -5,6 +5,8 @@ from flask_cors import CORS, cross_origin
 import azure.cognitiveservices.speech as speechsdk
 import os
 from dotenv import load_dotenv
+import sounddevice as sd
+from scipy.io.wavfile import write
 
 load_dotenv()
 
@@ -86,25 +88,30 @@ def text2text_post():
 @cross_origin()
 def text2speech_post():
     text = request.form['text']
+    audio_filename = request.form['audio_filename']
     speech_key, service_region = SPEECH_KEY, 'westus'
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm)
-
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=audio_filename)
     speech_config.speech_synthesis_voice_name='hi-IN-MadhurNeural'
-    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
-
+    speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
     speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
-    return speech_synthesis_result.audio_data
+    
+    if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        return '200'
+    elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = speech_synthesis_result.cancellation_details
+        return cancellation_details.reason
 
 
 @app.route('/speech2text', methods=['POST'])
 @cross_origin()
 def speech2text_post():
-    # text = request.form['text']
+    audio_filename = request.form['audio_filename']
     speech_key, service_region = SPEECH_KEY, 'westus'
-    audio_input = speechsdk.AudioConfig(filename="Conference.wav")
+    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     result = speech_recognizer.recognize_once_async().get()
     return result.text
@@ -113,21 +120,40 @@ def speech2text_post():
 @app.route('/speech2speech', methods=['POST'])
 @cross_origin()
 def speech2speech_post():
-    # text = request.form['text']
+    audio_output_filename = request.form['audio_output_filename']
+    audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_key, service_region = SPEECH_KEY, 'westus'
-    audio_input = speechsdk.AudioConfig(filename="Conference.wav")
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     result = speech_recognizer.recognize_once_async().get()
     text = result.text
     text_translated = text2text(text, 'en', 'hi')
+    
     speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm)
     speech_config.speech_synthesis_voice_name='hi-IN-MadhurNeural'
-    audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
+    audio_config = speechsdk.audio.AudioOutputConfig(filename=audio_output_filename)
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
     speech_synthesis_result = speech_synthesizer.speak_text_async(text_translated).get()
-    return speech_synthesis_result.audio_data
+
+    if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+        return '200'
+    elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = speech_synthesis_result.cancellation_details
+        return cancellation_details.reason
+
+
+@app.route('/record_audio', methods=['POST'])
+@cross_origin()
+def record_audio():
+    audio_output_filename = request.form['audio_output_filename']
+    fs = 44100  # Sample rate
+    seconds = 20  # Duration of recording
+
+    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+    sd.wait()  # Wait until recording is finished
+    write(audio_output_filename, fs, myrecording)  # Save as WAV file 
+    return '200'
 
 
 if __name__ == '__main__':
