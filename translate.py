@@ -77,9 +77,10 @@ def text2text_post():
     body = [{
         'text': text
     }]
-
+    # print(body)
     request_response = requests.post(constructed_url, params=params, headers=headers, json=body)
     response = request_response.json()
+    # print(response)
     translated_text = response[0]['translations'][0]['text']
     return translated_text
 
@@ -89,11 +90,13 @@ def text2text_post():
 def text2speech_post():
     text = request.form['text']
     audio_filename = request.form['audio_filename']
+    language = request.form['language']
     speech_key, service_region = SPEECH_KEY, 'westus'
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm)
     audio_config = speechsdk.audio.AudioOutputConfig(filename=audio_filename)
-    speech_config.speech_synthesis_voice_name='hi-IN-MadhurNeural'
+    language_to_speaker = {'en-IN': 'en-IN-PrabhatNeural', 'hi-IN': 'hi-IN-MadhurNeural'}
+    speech_config.speech_synthesis_voice_name=language_to_speaker[language]
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
     speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
     
@@ -108,9 +111,11 @@ def text2speech_post():
 @cross_origin()
 def speech2text_post():
     audio_filename = request.form['audio_filename']
+    from_language = request.form['from_language']
     speech_key, service_region = SPEECH_KEY, 'westus'
     audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    speech_config.speech_recognition_language=from_language
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     result = speech_recognizer.recognize_once_async().get()
@@ -121,39 +126,30 @@ def speech2text_post():
 @cross_origin()
 def speech2speech_post():
     audio_output_filename = request.form['audio_output_filename']
+    from_language = request.form['from']
+    to_language = request.form['to']
     audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
     speech_key, service_region = SPEECH_KEY, 'westus'
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    speech_config.speech_recognition_language=from_language
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
     result = speech_recognizer.recognize_once_async().get()
     text = result.text
-    text_translated = text2text(text, 'en', 'hi')
+    text_translated = text2text(text, from_language, to_language)
     
     speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm)
-    speech_config.speech_synthesis_voice_name='hi-IN-MadhurNeural'
+    language_to_speaker = {'en-IN': 'en-IN-PrabhatNeural', 'hi-IN': 'hi-IN-MadhurNeural'}
+    speech_config.speech_synthesis_voice_name=language_to_speaker[to_language]
     audio_config = speechsdk.audio.AudioOutputConfig(filename=audio_output_filename)
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
     speech_synthesis_result = speech_synthesizer.speak_text_async(text_translated).get()
 
     if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-        return '200'
+        return text_translated
     elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = speech_synthesis_result.cancellation_details
         return cancellation_details.reason
-
-
-@app.route('/record_audio', methods=['POST'])
-@cross_origin()
-def record_audio():
-    audio_output_filename = request.form['audio_output_filename']
-    fs = 44100  # Sample rate
-    seconds = 20  # Duration of recording
-
-    myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
-    sd.wait()  # Wait until recording is finished
-    write(audio_output_filename, fs, myrecording)  # Save as WAV file 
-    return '200'
 
 
 if __name__ == '__main__':
