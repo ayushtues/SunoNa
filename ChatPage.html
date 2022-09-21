@@ -17,6 +17,8 @@
     </head>
     
     <body background="london.jpg">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+        <script type="text/javascript" src="communicate.js"></script>
         <h1 align="center" style="color:black; font-size: 45px;">SunoNa</h1>
         <div class="container" align="left"  font-size:40px>
             <h1 align="center">User A</h1>
@@ -25,20 +27,20 @@
                 <form name= "UserA">
                     Enter your message: <br>
                     <input type="text" id='TextMessageA' required size=50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-microphone"></i></button><br><br>
-                    <input type="button" value="Send" style="background-color:green; width:100px; height:30px;"><br><br>
+                    <button class="btn" onclick='recordA()'><i class="fa fa-microphone"></i></button><br><br>
+                    <input type="button" onclick='texta2b()' value="Send" style="background-color:green; width:100px; height:30px;"><br><br>
                     <hr>
                     <br><br>
                     Text Message Received:<br>
                     <input type="text" id='ReceiveTextMessageA' required size=50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-play"></i></button><br><br>
+                    <button onclick='playtextA()' class="btn"><i class="fa fa-play"></i></button><br><br>
 
                     <i class="fa-solid fa-book-open-reader"></i>
 
                     <br>
                     Voice Message Received:<br>
                     <input type="text" id='ReceiveVoiceMessageA' required size = 50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-play"></i></button><br><br>
+                    <button onclick='playVoiceA()' class="btn"><i class="fa fa-play"></i></button><br><br>
                     <br>
                 </form>
             </div>
@@ -49,17 +51,17 @@
                 <form name= "UserB">
                     Enter your message: <br>
                     <input type="text" id='TextMessageB' required size=50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-microphone"></i></button><br><br>
-                    <input type="button" value="Send" style="background-color:green; width:100px; height:30px;"><br><br>
+                    <button class="btn" onclick='recordB()'><i class="fa fa-microphone"></i></button><br><br>
+                    <input type="button" onclick='textb2a()' value="Send" style="background-color:green; width:100px; height:30px;"><br><br>
                     <hr>
                     <br><br>
                     Text Message Received:<br>
                     <input type="text" id='ReceiveTextMessageB' required size=50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-play"></i></button><br><br>
+                    <button class="btn" onclick='playtextB()'><i class="fa fa-play"></i></button><br><br>
                     <br>
                     Voice Message Received:<br>
                     <input type="text" id='ReceiveVoiceMessageB' required size = 50px;> &nbsp;
-                    <button class="btn"><i class="fa fa-play"></i></button><br><br>
+                    <button class="btn" onclick='playVoiceB()'><i class="fa fa-play"></i></button><br><br>
                     <br>
                 </form>
             </div>
