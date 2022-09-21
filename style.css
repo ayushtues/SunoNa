@@ -1,20 +1,20 @@
 .container
 {
-background-color:gray; 
-height:400px; 
+background-color: white; 
+height:600px; 
 width:600px; 
 position:fixed; 
-left:100px; 
+left:300px; 
 top:100px; 
 border-style:solid;
 }
 .container2
 {
-background-color:gray; 
-height:400px; 
+background-color:white; 
+height:600px; 
 width:600px; 
 position:fixed; 
-left:800px; 
+left:1000px; 
 top:100px; 
 border-style:solid;
 }
@@ -28,3 +28,21 @@ th,td
 
 	text-align:center;
 }
+hr{
+	width: 550px;
+	position: absolute;
+	border-style: solid;
+}
+.btn {
+	background-color: rgb(110, 112, 114);
+	border: none;
+	color: white;
+	padding: 12px 16px;
+	font-size: 16px;
+	cursor: pointer;
+  }
+  
+  /* Darker background on mouse-over */
+  .btn:hover {
+	background-color: rgb(36, 37, 37);
+  }
