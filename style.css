@@ -1,0 +1,30 @@
+.container
+{
+background-color:gray; 
+height:400px; 
+width:600px; 
+position:fixed; 
+left:100px; 
+top:100px; 
+border-style:solid;
+}
+.container2
+{
+background-color:gray; 
+height:400px; 
+width:600px; 
+position:fixed; 
+left:800px; 
+top:100px; 
+border-style:solid;
+}
+
+th,td
+{
+	height:4px;
+	width:300px;
+	border:1px solid black;
+        border-collapse:collapse;
+
+	text-align:center;
+}
