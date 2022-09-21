@@ -30,7 +30,7 @@ function textb2a() {
 }
 
 function playtextA()
-{
+{   event.preventDefault();
     var input_text = document.getElementById("ReceiveTextMessageA").value;
     console.log(input_text);
     var dictToSend_text2speech = { 'text': input_text, 'language': LANGUAGE_1, 'audio_filename': 'text2speech.wav' }
@@ -47,7 +47,7 @@ function playtextA()
 }
 
 function playtextB()
-{
+{   event.preventDefault();
     var input_text = document.getElementById("ReceiveTextMessageB").value;
     console.log(input_text);
     var dictToSend_text2speech = { 'text': input_text, 'language': LANGUAGE_2, 'audio_filename': 'text2speech.wav' }
@@ -64,6 +64,7 @@ function playtextB()
 }
 
 function recordA(){
+    event.preventDefault();
     var dictToSend_speech2speech = { 'audio_output_filename': 'speech2speechB.wav', 'from': LANGUAGE_1, 'to': LANGUAGE_2 }
     var callback = $.ajax({
         type: "POST",
@@ -78,6 +79,7 @@ function recordA(){
 }
 
 function recordB(){
+    event.preventDefault();
     var dictToSend_speech2speech = { 'audio_output_filename': 'speech2speechA.wav', 'from': LANGUAGE_2, 'to': LANGUAGE_1 }
     var callback = $.ajax({
         type: "POST",
@@ -93,12 +95,14 @@ function recordB(){
 
 function playVoiceA()
 {
+    event.preventDefault();
     var audio = new Audio('speech2speechA.wav');
     audio.play();  
 }
 
 function playVoiceB()
 {
+    event.preventDefault();
     var audio = new Audio('speech2speechB.wav');
     audio.play();  
 }
